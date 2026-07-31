@@ -10,120 +10,117 @@ export default function ContactPage() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
+    // 模拟提交
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    console.log('表单数据:', form);
+
     setSubmitted(true);
+    setLoading(false);
+    setForm({ name: '', email: '', company: '', message: '' });
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh',
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif",
-      backgroundColor: '#1e3a5f',
-    }}>
-
-      {/* ===== Header ===== */}
-      <header style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '80px',
-        backgroundColor: 'white',
-        borderBottom: '1px solid #e5e5e5',
-        zIndex: 100,
-      }}>
-        <div style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '0 20px',
-          height: '100%',
+    <div
+      style={{
+        minHeight: '100vh',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif",
+        backgroundColor: '#1e3a5f',
+      }}
+    >
+      {/* 顶部导航 */}
+      <header
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '70px',
+          backgroundColor: 'white',
+          borderBottom: '1px solid #e5e5e5',
+          zIndex: 100,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '28px' }}>🤖</span>
-              <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#333' }}>Factory Direct</span>
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '0 20px',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <a href="/" style={{ textDecoration: 'none', fontSize: '20px', fontWeight: 'bold', color: '#1e3a5f' }}>
+            🏭 Factory Direct
+          </a>
+          <div style={{ display: 'flex', gap: '30px' }}>
+            <a href="/" style={{ textDecoration: 'none', color: '#333', fontSize: '15px' }}>
+              Home
+            </a>
+            <a href="/contact" style={{ textDecoration: 'none', color: '#2563eb', fontSize: '15px', fontWeight: 'bold' }}>
+              Contact
             </a>
           </div>
-          <a href="/" style={{ fontSize: '20px', fontWeight: 'bold', color: '#333', textDecoration: 'none' }}>
-            Factory Tour Videos
-          </a>
-          <a href="/contact" style={{
-            fontSize: '20px',
-            color: '#2563eb',
-            textDecoration: 'none',
-            fontWeight: 'bold',
-          }}>
-            Contact Us
-          </a>
         </div>
       </header>
 
-      {/* ===== Contact Section ===== */}
-      <section style={{
-        paddingTop: '120px',
-        paddingBottom: '80px',
-        minHeight: '100vh',
-      }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
-
-          <h1 style={{
-            fontSize: '36px',
-            fontWeight: '700',
-            letterSpacing: '-0.3px',
-            textAlign: 'center',
-            marginBottom: '12px',
-            color: 'white',
-          }}>
+      {/* 主体内容 */}
+      <section style={{ paddingTop: '100px', paddingBottom: '60px' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto', padding: '0 20px' }}>
+          <h1 style={{ fontSize: '34px', fontWeight: '700', textAlign: 'center', color: 'white', marginBottom: '8px' }}>
             Contact Us
           </h1>
-          <p style={{
-            color: 'rgba(255,255,255,0.7)',
-            textAlign: 'center',
-            marginBottom: '48px',
-            fontSize: '16px',
-          }}>
+          <p style={{ color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginBottom: '40px', fontSize: '16px' }}>
             Get in touch with us for factory tours and inquiries
           </p>
 
-          {/* ===== Form ===== */}
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '40px',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-            marginBottom: '48px',
-          }}>
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '36px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+            }}
+          >
             {submitted ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <div style={{ textAlign: 'center', padding: '30px 0' }}>
                 <span style={{ fontSize: '48px' }}>✅</span>
-                <h2 style={{ fontSize: '24px', fontWeight: '600', marginTop: '16px', marginBottom: '8px' }}>
-                  Thank You!
-                </h2>
-                <p style={{ color: '#666' }}>
-                  We&apos;ll get back to you within 24 hours.
-                </p>
+                <h2 style={{ fontSize: '22px', marginTop: '12px', marginBottom: '6px' }}>Thank You!</h2>
+                <p style={{ color: '#666' }}>We'll get back to you within 24 hours.</p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  style={{
+                    marginTop: '20px',
+                    padding: '10px 32px',
+                    backgroundColor: '#1e3a5f',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  Send Another Message
+                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                {/* Name */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#333',
-                  }}>
-                    Name
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#333' }}>
+                    Name *
                   </label>
                   <input
                     type="text"
@@ -135,26 +132,18 @@ export default function ContactPage() {
                     style={{
                       width: '100%',
                       padding: '12px 16px',
-                      fontSize: '16px',
+                      fontSize: '15px',
                       border: '1px solid #ddd',
                       borderRadius: '10px',
                       outline: 'none',
                       boxSizing: 'border-box',
-                      fontFamily: 'inherit',
                     }}
                   />
                 </div>
 
-                {/* Email */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#333',
-                  }}>
-                    Email
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#333' }}>
+                    Email *
                   </label>
                   <input
                     type="email"
@@ -166,25 +155,17 @@ export default function ContactPage() {
                     style={{
                       width: '100%',
                       padding: '12px 16px',
-                      fontSize: '16px',
+                      fontSize: '15px',
                       border: '1px solid #ddd',
                       borderRadius: '10px',
                       outline: 'none',
                       boxSizing: 'border-box',
-                      fontFamily: 'inherit',
                     }}
                   />
                 </div>
 
-                {/* Company */}
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#333',
-                  }}>
+                <div style={{ marginBottom: '18px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#333' }}>
                     Company
                   </label>
                   <input
@@ -196,26 +177,18 @@ export default function ContactPage() {
                     style={{
                       width: '100%',
                       padding: '12px 16px',
-                      fontSize: '16px',
+                      fontSize: '15px',
                       border: '1px solid #ddd',
                       borderRadius: '10px',
                       outline: 'none',
                       boxSizing: 'border-box',
-                      fontFamily: 'inherit',
                     }}
                   />
                 </div>
 
-                {/* Message */}
-                <div style={{ marginBottom: '24px' }}>
-                  <label style={{
-                    display: 'block',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginBottom: '8px',
-                    color: '#333',
-                  }}>
-                    Message
+                <div style={{ marginBottom: '22px' }}>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '6px', color: '#333' }}>
+                    Message *
                   </label>
                   <textarea
                     name="message"
@@ -227,7 +200,7 @@ export default function ContactPage() {
                     style={{
                       width: '100%',
                       padding: '12px 16px',
-                      fontSize: '16px',
+                      fontSize: '15px',
                       border: '1px solid #ddd',
                       borderRadius: '10px',
                       outline: 'none',
@@ -238,68 +211,86 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <button type="submit" style={{
-                  width: '100%',
-                  padding: '14px',
-                  backgroundColor: '#1e3a5f',
-                  color: 'white',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  border: 'none',
-                  borderRadius: '50px',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  letterSpacing: '-0.2px',
-                }}>
-                  Send Message
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: loading ? '#999' : '#1e3a5f',
+                    color: 'white',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    border: 'none',
+                    borderRadius: '50px',
+                    cursor: loading ? 'default' : 'pointer',
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? 'Sending...' : 'Send Message'}
                 </button>
+
+                <p style={{ textAlign: 'center', color: '#aaa', fontSize: '12px', marginTop: '12px' }}>
+                  We'll respond within 24 hours
+                </p>
               </form>
             )}
           </div>
 
-          {/* ===== Contact Info ===== */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '40px',
-            flexWrap: 'wrap',
-            textAlign: 'center',
-          }}>
+          {/* 联系方式 */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '40px',
+              flexWrap: 'wrap',
+              textAlign: 'center',
+              marginTop: '40px',
+            }}
+          >
             <div>
-              <div style={{ fontSize: '28px', marginBottom: '8px' }}>📧</div>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>Email</p>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>Coming soon</p>
+              <div style={{ fontSize: '28px' }}>📧</div>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: '4px' }}>
+                Email
+              </p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                support@factorydirect.com
+              </p>
             </div>
             <div>
-              <div style={{ fontSize: '28px', marginBottom: '8px' }}>💬</div>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>WeChat</p>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>Coming soon</p>
+              <div style={{ fontSize: '28px' }}>💬</div>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: '4px' }}>
+                WeChat
+              </p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                FactoryDirect_CN
+              </p>
             </div>
             <div>
-              <div style={{ fontSize: '28px', marginBottom: '8px' }}>📞</div>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', fontWeight: '600' }}>Phone</p>
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>Coming soon</p>
+              <div style={{ fontSize: '28px' }}>📞</div>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: '4px' }}>
+                Phone
+              </p>
+              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                +86 400 8888 666
+              </p>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* ===== Footer ===== */}
-      <footer style={{
-        backgroundColor: '#111',
-        color: 'white',
-        padding: '60px 20px',
-        textAlign: 'center',
-      }}>
-        <p style={{ marginBottom: '8px', fontWeight: '400' }}>
-          Connecting Global Buyers Directly with Chinese Manufacturers
-        </p>
-        <p style={{ color: '#666', marginTop: '16px', fontSize: '14px', fontWeight: '400' }}>
-          More factories coming soon...
+      {/* 底部 */}
+      <footer
+        style={{
+          backgroundColor: '#111',
+          color: 'white',
+          padding: '40px 20px',
+          textAlign: 'center',
+        }}
+      >
+        <p style={{ fontSize: '14px', color: '#888' }}>
+          © 2026 Factory Direct. All rights reserved.
         </p>
       </footer>
-
     </div>
   );
 }

@@ -1,85 +1,59 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-
-const allVideos = [
-  {
-    id: '1',
-    title: 'PCB Assembly Line - First Person Tour',
-    factoryName: 'Shenzhen Tech Electronics',
-    productType: 'Electronics Manufacturing',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '4:05',
-    description: 'Walk through a complete PCB assembly line in Shenzhen. See every step from component placement to quality testing. First-person perspective gives you the real factory floor experience.',
-  },
-  {
-    id: '2',
-    title: 'Garment Production - From Fabric to Finished',
-    factoryName: 'Guangzhou Textile Co.',
-    productType: 'Textile & Apparel',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '3:09',
-    description: 'Follow the entire garment production process at our Guangzhou facility. From fabric cutting to stitching, pressing, and packaging — all captured from a first-person view.',
-  },
-  {
-    id: '3',
-    title: 'CNC Machining Process - Precision Parts',
-    factoryName: 'Dongguan Precision Mfg',
-    productType: 'Machinery & Parts',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '5:12',
-    description: 'Experience precision CNC machining up close. This tour shows raw material transformation into high-tolerance parts, with detailed views of each machining stage.',
-  },
-  {
-    id: '4',
-    title: 'LED Display Assembly Workshop Tour',
-    factoryName: 'Shenzhen Optoelectronics',
-    productType: 'Electronics',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '3:18',
-    description: 'Tour an LED display assembly workshop. See how panels are assembled, tested, and packaged. First-person perspective shows real working conditions.',
-  },
-  {
-    id: '5',
-    title: 'Stainless Steel Kitchenware Production',
-    factoryName: 'Yongkang Metalworks',
-    productType: 'Kitchenware',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '4:27',
-    description: 'From raw stainless steel to finished kitchenware. This tour covers stamping, polishing, and quality inspection in a real production environment.',
-  },
-  {
-    id: '6',
-    title: 'Injection Molding - Plastic Parts Factory',
-    factoryName: 'Ningbo Plastics Co.',
-    productType: 'Plastic Manufacturing',
-    videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    duration: '3:54',
-    description: 'See how injection molding works in a real factory. Watch the complete cycle from mold setup to finished plastic parts, captured from the operator\'s perspective.',
-  },
-];
+import Link from 'next/link';
 
 export default function VideoDetailPage() {
   const params = useParams();
-  const video = allVideos.find((v) => v.id === params.id);
+  const videoId = params.id as string;
+  
+  const [video, setVideo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 从 localStorage 读取后台数据
+    const stored = localStorage.getItem('factory_videos');
+    if (stored) {
+      try {
+        const allVideos = JSON.parse(stored);
+        const found = allVideos.find((v: any) => v.id === parseInt(videoId));
+        setVideo(found || null);
+      } catch (e) {
+        console.error('读取失败:', e);
+      }
+    }
+    setLoading(false);
+  }, [videoId]);
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        backgroundColor: '#111', 
+        color: 'white' 
+      }}>
+        <p>加载中...</p>
+      </div>
+    );
+  }
 
   if (!video) {
     return (
       <div style={{ 
-        minHeight: '100vh',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif",
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#111',
-        color: 'white',
+        minHeight: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        backgroundColor: '#111', 
+        color: 'white' 
       }}>
-        <div style={{ textAlign: 'center' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '16px' }}>Video Not Found</h1>
-          <a href="/" style={{ color: '#4da3ff', textDecoration: 'none', fontWeight: '600' }}>
-            ← Back to Videos
-          </a>
-        </div>
+        <h1 style={{ fontSize: 24, marginBottom: 16 }}>😕 视频不存在</h1>
+        <Link href="/" style={{ color: '#4da3ff', textDecoration: 'none' }}>← 返回首页</Link>
       </div>
     );
   }
@@ -87,14 +61,14 @@ export default function VideoDetailPage() {
   return (
     <div style={{ 
       minHeight: '100vh',
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif",
       backgroundColor: '#111',
       color: 'white',
     }}>
 
       {/* 返回按钮 */}
       <div style={{ padding: '24px' }}>
-        <a href="/#videos" style={{
+        <Link href="/#videos" style={{
           color: '#999',
           textDecoration: 'none',
           fontSize: '15px',
@@ -104,10 +78,10 @@ export default function VideoDetailPage() {
           gap: '8px',
         }}>
           ← Back to Videos
-        </a>
+        </Link>
       </div>
 
-      {/* 视频播放器 - 全宽 */}
+      {/* 视频播放器 */}
       <div style={{
         width: '100%',
         maxWidth: '1200px',
@@ -121,7 +95,8 @@ export default function VideoDetailPage() {
           paddingTop: '56.25%',
         }}>
           <video
-            src={video.videoUrl}
+            src={video.video_url}
+            poster={video.thumbnail_url}
             controls
             autoPlay
             style={{
@@ -159,7 +134,7 @@ export default function VideoDetailPage() {
             fontSize: '13px',
             fontWeight: '500',
           }}>
-            {video.factoryName}
+            🏭 {video.factory_name}
           </span>
           <span style={{
             border: '1px solid rgba(255,255,255,0.2)',
@@ -168,25 +143,42 @@ export default function VideoDetailPage() {
             fontSize: '13px',
             fontWeight: '500',
           }}>
-            {video.productType}
+            📦 {video.product_name}
           </span>
-          <span style={{ color: '#999', fontSize: '14px' }}>
-            {video.duration}
+          <span style={{
+            border: '1px solid rgba(255,255,255,0.2)',
+            padding: '8px 16px',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '500',
+          }}>
+            {video.category}
+          </span>
+          <span style={{ 
+            color: '#fff', 
+            fontSize: '12px', 
+            backgroundColor: video.is_published ? '#2e7d32' : '#ff9800', 
+            padding: '4px 14px', 
+            borderRadius: '20px' 
+          }}>
+            {video.is_published ? '✅ 已上架' : '⏳ 待上架'}
           </span>
         </div>
 
-        <p style={{
-          fontSize: '16px',
-          color: '#aaa',
-          lineHeight: '1.8',
-          fontWeight: '400',
-          maxWidth: '700px',
-          marginBottom: '32px',
-        }}>
-          {video.description}
-        </p>
+        {video.description && (
+          <p style={{
+            fontSize: '16px',
+            color: '#aaa',
+            lineHeight: '1.8',
+            fontWeight: '400',
+            maxWidth: '700px',
+            marginBottom: '32px',
+          }}>
+            {video.description}
+          </p>
+        )}
 
-        <a href="/contact" style={{
+        <Link href="/contact" style={{
           padding: '14px 32px',
           backgroundColor: 'white',
           color: '#111',
@@ -195,10 +187,9 @@ export default function VideoDetailPage() {
           fontWeight: '600',
           textDecoration: 'none',
           display: 'inline-block',
-          letterSpacing: '-0.2px',
         }}>
           Contact Us
-        </a>
+        </Link>
       </div>
 
     </div>

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useState } from 'react';
 
+// ===== 类型定义 =====
 interface Video {
   id: number;
   title: string;
@@ -28,7 +28,30 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
 
   // ===== 视频相关 =====
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<Video[]>([
+    {
+      id: 1,
+      title: 'PCB Assembly Line - First Person Tour',
+      description: '沉浸式参观PCB电路板生产线',
+      video_url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      thumbnail_url: 'https://picsum.photos/seed/pcb/400/300',
+      category: 'Electronics Manufacturing',
+      factory_name: 'Shenzhen Tech Electronics',
+      product_name: 'PCB Assembly Line',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 2,
+      title: 'CNC Machining Process - Precision Parts',
+      description: '高精度CNC加工过程展示',
+      video_url: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      thumbnail_url: 'https://picsum.photos/seed/cnc/400/300',
+      category: 'Machinery & Parts',
+      factory_name: 'Dongguan Precision Mfg',
+      product_name: 'CNC Machining Process',
+      created_at: new Date().toISOString(),
+    },
+  ]);
   const [videoForm, setVideoForm] = useState({
     title: '',
     description: '',
@@ -41,7 +64,20 @@ export default function AdminPage() {
   const [uploadingVideo, setUploadingVideo] = useState(false);
 
   // ===== Logo 相关 =====
-  const [logos, setLogos] = useState<Logo[]>([]);
+  const [logos, setLogos] = useState<Logo[]>([
+    {
+      id: 1,
+      image_url: 'https://picsum.photos/seed/logo1/200/100',
+      is_active: true,
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 2,
+      image_url: 'https://picsum.photos/seed/logo2/200/100',
+      is_active: true,
+      created_at: new Date().toISOString(),
+    },
+  ]);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
@@ -59,46 +95,14 @@ export default function AdminPage() {
   const handleLogin = () => {
     if (password === 'asd123') {
       setIsLoggedIn(true);
-      showMessage('登录成功！', 'success');
+      showMessage('✅ 登录成功！', 'success');
     } else {
       showMessage('❌ 密码错误', 'error');
     }
   };
 
-  // ===== 加载数据 =====
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchVideos();
-      fetchLogos();
-    }
-  }, [isLoggedIn]);
-
-  async function fetchVideos() {
-    const { data, error } = await supabase
-      .from('videos')
-      .select('*')
-      .order('id', { ascending: false });
-    if (error) {
-      console.error('加载视频失败:', error);
-    } else {
-      setVideos(data || []);
-    }
-  }
-
-  async function fetchLogos() {
-    const { data, error } = await supabase
-      .from('logos')
-      .select('*')
-      .order('id', { ascending: false });
-    if (error) {
-      console.error('加载Logo失败:', error);
-    } else {
-      setLogos(data || []);
-    }
-  }
-
-  // ===== 上传视频（本地文件） =====
-  async function handleUploadVideo(e: React.FormEvent) {
+  // ===== 上传视频 =====
+  const handleUploadVideo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!videoFile) {
       showMessage('请选择一个视频文件', 'error');
@@ -112,93 +116,38 @@ export default function AdminPage() {
     setUploadingVideo(true);
     showMessage('正在上传视频...', 'info');
 
-    try {
-      // 1. 上传视频到 Storage
-      const videoExt = videoFile.name.split('.').pop();
-      const videoFileName = `videos/${Date.now()}.${videoExt}`;
-      const { error: videoUploadError } = await supabase.storage
-        .from('videos')
-        .upload(videoFileName, videoFile);
+    // 模拟上传延迟
+    setTimeout(() => {
+      const newVideo: Video = {
+        id: Date.now(),
+        title: videoForm.title,
+        description: videoForm.description || '',
+        video_url: URL.createObjectURL(videoFile),
+        thumbnail_url: thumbnailFile ? URL.createObjectURL(thumbnailFile) : 'https://picsum.photos/seed/' + Date.now() + '/400/300',
+        category: videoForm.category || '未分类',
+        factory_name: videoForm.factory_name,
+        product_name: videoForm.product_name,
+        created_at: new Date().toISOString(),
+      };
 
-      if (videoUploadError) {
-        showMessage('❌ 视频上传失败: ' + videoUploadError.message, 'error');
-        setUploadingVideo(false);
-        return;
-      }
-
-      const { data: videoUrlData } = supabase.storage
-        .from('videos')
-        .getPublicUrl(videoFileName);
-      const videoUrl = videoUrlData.publicUrl;
-
-      // 2. 上传缩略图（如果有）
-      let thumbnailUrl = '';
-      if (thumbnailFile) {
-        const thumbExt = thumbnailFile.name.split('.').pop();
-        const thumbFileName = `thumbnails/${Date.now()}.${thumbExt}`;
-        const { error: thumbUploadError } = await supabase.storage
-          .from('videos')
-          .upload(thumbFileName, thumbnailFile);
-
-        if (!thumbUploadError) {
-          const { data: thumbUrlData } = supabase.storage
-            .from('videos')
-            .getPublicUrl(thumbFileName);
-          thumbnailUrl = thumbUrlData.publicUrl;
-        }
-      }
-
-      // 3. 保存到数据库
-      const { error: dbError } = await supabase
-        .from('videos')
-        .insert([
-          {
-            title: videoForm.title,
-            description: videoForm.description || '',
-            video_url: videoUrl,
-            thumbnail_url: thumbnailUrl,
-            category: videoForm.category || '',
-            factory_name: videoForm.factory_name,
-            product_name: videoForm.product_name,
-          },
-        ]);
-
-      if (dbError) {
-        showMessage('❌ 保存失败: ' + dbError.message, 'error');
-      } else {
-        showMessage('✅ 视频上传成功！', 'success');
-        setVideoForm({ title: '', description: '', category: '', factory_name: '', product_name: '' });
-        setVideoFile(null);
-        setThumbnailFile(null);
-        fetchVideos();
-      }
-    } catch (err) {
-      showMessage('❌ 上传失败: ' + (err as Error).message, 'error');
-    }
-    setUploadingVideo(false);
-  }
+      setVideos([newVideo, ...videos]);
+      setVideoForm({ title: '', description: '', category: '', factory_name: '', product_name: '' });
+      setVideoFile(null);
+      setThumbnailFile(null);
+      setUploadingVideo(false);
+      showMessage('✅ 视频上传成功！', 'success');
+    }, 1500);
+  };
 
   // ===== 删除视频 =====
-  async function deleteVideo(id: number, videoUrl: string) {
+  const deleteVideo = (id: number) => {
     if (!confirm('确定要删除这条视频吗？')) return;
-
-    // 从 Storage 删除视频
-    const videoPath = videoUrl.split('/videos/')[1];
-    if (videoPath) {
-      await supabase.storage.from('videos').remove([`videos/${videoPath}`]);
-    }
-
-    const { error } = await supabase.from('videos').delete().eq('id', id);
-    if (error) {
-      showMessage('❌ 删除失败: ' + error.message, 'error');
-    } else {
-      showMessage('✅ 删除成功', 'success');
-      fetchVideos();
-    }
-  }
+    setVideos(videos.filter((v) => v.id !== id));
+    showMessage('✅ 删除成功', 'success');
+  };
 
   // ===== 上传 Logo =====
-  async function handleUploadLogo(e: React.FormEvent) {
+  const handleUploadLogo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!logoFile) {
       showMessage('请选择一张图片', 'error');
@@ -208,59 +157,26 @@ export default function AdminPage() {
     setUploadingLogo(true);
     showMessage('正在上传Logo...', 'info');
 
-    try {
-      const fileExt = logoFile.name.split('.').pop();
-      const fileName = `logos/${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(fileName, logoFile);
-
-      if (uploadError) {
-        showMessage('❌ Logo上传失败: ' + uploadError.message, 'error');
-        setUploadingLogo(false);
-        return;
-      }
-
-      const { data: urlData } = supabase.storage
-        .from('logos')
-        .getPublicUrl(fileName);
-      const imageUrl = urlData.publicUrl;
-
-      const { error: dbError } = await supabase
-        .from('logos')
-        .insert([{ image_url: imageUrl, is_active: true }]);
-
-      if (dbError) {
-        showMessage('❌ 保存Logo失败: ' + dbError.message, 'error');
-      } else {
-        showMessage('✅ Logo上传成功！', 'success');
-        setLogoFile(null);
-        fetchLogos();
-      }
-    } catch (err) {
-      showMessage('❌ 上传失败: ' + (err as Error).message, 'error');
-    }
-    setUploadingLogo(false);
-  }
+    setTimeout(() => {
+      const newLogo: Logo = {
+        id: Date.now(),
+        image_url: URL.createObjectURL(logoFile),
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+      setLogos([newLogo, ...logos]);
+      setLogoFile(null);
+      setUploadingLogo(false);
+      showMessage('✅ Logo上传成功！', 'success');
+    }, 1000);
+  };
 
   // ===== 删除 Logo =====
-  async function deleteLogo(id: number, imageUrl: string) {
+  const deleteLogo = (id: number) => {
     if (!confirm('确定要删除这个Logo吗？')) return;
-
-    const path = imageUrl.split('/logos/')[1];
-    if (path) {
-      await supabase.storage.from('logos').remove([`logos/${path}`]);
-    }
-
-    const { error } = await supabase.from('logos').delete().eq('id', id);
-    if (error) {
-      showMessage('❌ 删除失败: ' + error.message, 'error');
-    } else {
-      showMessage('✅ Logo删除成功', 'success');
-      fetchLogos();
-    }
-  }
+    setLogos(logos.filter((l) => l.id !== id));
+    showMessage('✅ Logo删除成功', 'success');
+  };
 
   // ===== 未登录 =====
   if (!isLoggedIn) {
@@ -275,7 +191,7 @@ export default function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-            style={{ width: '100%', padding: '12px', fontSize: 16, border: '1px solid #ddd', borderRadius: 8, marginBottom: 12 }}
+            style={{ width: '100%', padding: '12px', fontSize: 16, border: '1px solid #ddd', borderRadius: 8, marginBottom: 12, boxSizing: 'border-box' }}
           />
           <button
             onClick={handleLogin}
@@ -284,7 +200,7 @@ export default function AdminPage() {
             登录
           </button>
           {message && (
-            <p style={{ marginTop: 12, textAlign: 'center', color: messageType === 'error' ? 'red' : 'green' }}>
+            <p style={{ marginTop: 12, textAlign: 'center', color: messageType === 'error' ? '#c62828' : '#2e7d32' }}>
               {message}
             </p>
           )}
@@ -330,7 +246,7 @@ export default function AdminPage() {
                 value={videoForm.title}
                 onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
                 required
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6 }}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, boxSizing: 'border-box' }}
               />
               <input
                 type="text"
@@ -338,7 +254,7 @@ export default function AdminPage() {
                 value={videoForm.factory_name}
                 onChange={(e) => setVideoForm({ ...videoForm, factory_name: e.target.value })}
                 required
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6 }}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, boxSizing: 'border-box' }}
               />
               <input
                 type="text"
@@ -346,21 +262,21 @@ export default function AdminPage() {
                 value={videoForm.product_name}
                 onChange={(e) => setVideoForm({ ...videoForm, product_name: e.target.value })}
                 required
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6 }}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, boxSizing: 'border-box' }}
               />
               <input
                 type="text"
                 placeholder="类别（如: Electronics Manufacturing）"
                 value={videoForm.category}
                 onChange={(e) => setVideoForm({ ...videoForm, category: e.target.value })}
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6 }}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, boxSizing: 'border-box' }}
               />
               <input
                 type="text"
                 placeholder="描述（可选）"
                 value={videoForm.description}
                 onChange={(e) => setVideoForm({ ...videoForm, description: e.target.value })}
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, gridColumn: '1 / -1' }}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: 6, boxSizing: 'border-box', gridColumn: '1 / -1' }}
               />
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', marginBottom: 4, fontWeight: 500 }}>选择视频文件 *</label>
@@ -369,7 +285,7 @@ export default function AdminPage() {
                   accept="video/*"
                   onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
                   required
-                  style={{ padding: '8px' }}
+                  style={{ padding: '8px', boxSizing: 'border-box' }}
                 />
                 {videoFile && <span style={{ marginLeft: 12, color: '#666' }}>📹 {videoFile.name}</span>}
               </div>
@@ -379,7 +295,7 @@ export default function AdminPage() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                  style={{ padding: '8px' }}
+                  style={{ padding: '8px', boxSizing: 'border-box' }}
                 />
                 {thumbnailFile && <span style={{ marginLeft: 12, color: '#666' }}>🖼️ {thumbnailFile.name}</span>}
               </div>
@@ -387,7 +303,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={uploadingVideo}
-              style={{ marginTop: 16, padding: '12px 32px', backgroundColor: '#1e3a5f', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 16 }}
+              style={{ marginTop: 16, padding: '12px 32px', backgroundColor: uploadingVideo ? '#999' : '#1e3a5f', color: 'white', border: 'none', borderRadius: 6, cursor: uploadingVideo ? 'default' : 'pointer', fontSize: 16 }}
             >
               {uploadingVideo ? '上传中...' : '📤 上传视频'}
             </button>
@@ -405,7 +321,7 @@ export default function AdminPage() {
                   <span style={{ color: '#888', marginLeft: 12 }}>{v.factory_name} • {v.category}</span>
                 </div>
                 <button
-                  onClick={() => deleteVideo(v.id, v.video_url)}
+                  onClick={() => deleteVideo(v.id)}
                   style={{ padding: '4px 12px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
                 >
                   删除
@@ -427,14 +343,14 @@ export default function AdminPage() {
                 accept="image/*"
                 onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
                 required
-                style={{ padding: '8px' }}
+                style={{ padding: '8px', boxSizing: 'border-box' }}
               />
               {logoFile && <span style={{ marginLeft: 12, color: '#666' }}>🖼️ {logoFile.name}</span>}
             </div>
             <button
               type="submit"
               disabled={uploadingLogo}
-              style={{ marginTop: 16, padding: '12px 32px', backgroundColor: '#1e3a5f', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 16 }}
+              style={{ marginTop: 16, padding: '12px 32px', backgroundColor: uploadingLogo ? '#999' : '#1e3a5f', color: 'white', border: 'none', borderRadius: 6, cursor: uploadingLogo ? 'default' : 'pointer', fontSize: 16 }}
             >
               {uploadingLogo ? '上传中...' : '📤 上传 Logo'}
             </button>
@@ -449,7 +365,7 @@ export default function AdminPage() {
               <div key={l.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 12, backgroundColor: '#f9f9f9', borderRadius: 8 }}>
                 <img src={l.image_url} alt="Logo" style={{ maxWidth: 120, maxHeight: 60, objectFit: 'contain' }} />
                 <button
-                  onClick={() => deleteLogo(l.id, l.image_url)}
+                  onClick={() => deleteLogo(l.id)}
                   style={{ marginTop: 8, padding: '4px 12px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
                 >
                   删除
