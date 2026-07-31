@@ -3,12 +3,11 @@
 import { useRef, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
-interface LogoItem {
-  id: number;
-  name: string;
-  website: string;
-  imageUrl: string;
-}
+const DEFAULT_LOGOS = [
+  { id: 1, name: 'TechCorp', website: 'techcorp.com', imageUrl: '' },
+  { id: 2, name: 'GlobalTrade', website: 'globaltrade.com', imageUrl: '' },
+  { id: 3, name: 'MegaBuy', website: 'megabuy.com', imageUrl: '' },
+];
 
 interface Video {
   id: number;
@@ -19,20 +18,16 @@ interface Video {
   category: string;
   factory_name: string;
   product_name: string;
+  is_published?: boolean;
   created_at: string;
 }
 
 export default function HomePage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videos, setVideos] = useState<Video[]>([]);
-  const [logos, setLogos] = useState<LogoItem[]>([
-    { id: 1, name: 'TechCorp', website: 'techcorp.com', imageUrl: '' },
-    { id: 2, name: 'GlobalTrade', website: 'globaltrade.com', imageUrl: '' },
-    { id: 3, name: 'MegaBuy', website: 'megabuy.com', imageUrl: '' },
-  ]);
+  const [logos, setLogos] = useState(DEFAULT_LOGOS);
   const [loading, setLoading] = useState(true);
 
-  // ===== 从 Supabase 读取视频数据 =====
   useEffect(() => {
     async function fetchVideos() {
       const { data, error } = await supabase
@@ -40,45 +35,39 @@ export default function HomePage() {
         .select('*')
         .order('id', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching videos:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
+      if (!error && data && data.length > 0) {
         setVideos(data);
       } else {
         // 演示数据
         setVideos([
-          { id: 1, title: 'PCB Assembly Line - First Person Tour', description: '沉浸式参观PCB电路板生产线', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics Manufacturing', factory_name: 'Shenzhen Tech Electronics', product_name: 'PCB Assembly Line', created_at: '' },
-          { id: 2, title: 'Garment Production - From Fabric to Finished', description: '从面料到成衣的完整生产流程', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Textile & Apparel', factory_name: 'Guangzhou Textile Co.', product_name: 'Garment Production', created_at: '' },
-          { id: 3, title: 'CNC Machining Process - Precision Parts', description: '高精度CNC加工过程展示', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Machinery & Parts', factory_name: 'Dongguan Precision Mfg', product_name: 'CNC Machining Process', created_at: '' },
-          { id: 4, title: 'LED Display Assembly Workshop Tour', description: 'LED显示屏组装车间参观', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics', factory_name: 'Shenzhen Optoelectronics', product_name: 'LED Display Assembly', created_at: '' },
-          { id: 5, title: 'Stainless Steel Kitchenware Production', description: '不锈钢厨具生产工艺', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Kitchenware', factory_name: 'Yongkang Metalworks', product_name: 'Stainless Steel Kitchenware', created_at: '' },
-          { id: 6, title: 'Injection Molding - Plastic Parts Factory', description: '注塑成型塑料零件工厂', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Plastic Manufacturing', factory_name: 'Ningbo Plastics Co.', product_name: 'Injection Molding', created_at: '' },
+          { id: 1, title: 'PCB Assembly Line - First Person Tour', description: '沉浸式参观PCB电路板生产线', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics Manufacturing', factory_name: 'Shenzhen Tech Electronics', product_name: 'PCB Assembly Line', is_published: true, created_at: '' },
+          { id: 2, title: 'Garment Production - From Fabric to Finished', description: '从面料到成衣的完整生产流程', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Textile & Apparel', factory_name: 'Guangzhou Textile Co.', product_name: 'Garment Production', is_published: true, created_at: '' },
+          { id: 3, title: 'CNC Machining Process - Precision Parts', description: '高精度CNC加工过程展示', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Machinery & Parts', factory_name: 'Dongguan Precision Mfg', product_name: 'CNC Machining Process', is_published: true, created_at: '' },
+          { id: 4, title: 'LED Display Assembly Workshop Tour', description: 'LED显示屏组装车间参观', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics', factory_name: 'Shenzhen Optoelectronics', product_name: 'LED Display Assembly', is_published: true, created_at: '' },
+          { id: 5, title: 'Stainless Steel Kitchenware Production', description: '不锈钢厨具生产工艺', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Kitchenware', factory_name: 'Yongkang Metalworks', product_name: 'Stainless Steel Kitchenware', is_published: true, created_at: '' },
+          { id: 6, title: 'Injection Molding - Plastic Parts Factory', description: '注塑成型塑料零件工厂', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Plastic Manufacturing', factory_name: 'Ningbo Plastics Co.', product_name: 'Injection Molding', is_published: true, created_at: '' },
         ]);
       }
       setLoading(false);
     }
 
     fetchVideos();
-  }, []);
 
-  // ===== Logo 从 localStorage 读取 =====
-  useEffect(() => {
     if (videoRef.current) {
       videoRef.current.play().catch(() => {});
     }
+
     const stored = localStorage.getItem('logos');
     if (stored) {
-      setLogos(JSON.parse(stored));
+      try {
+        setLogos(JSON.parse(stored));
+      } catch {}
     }
   }, []);
 
-  // ===== 视频分两行显示 =====
-  const displayVideos = videos.slice(0, 6);
-  const firstRow = displayVideos.slice(0, 3);
-  const secondRow = displayVideos.slice(3, 6);
+  const publishedVideos = videos.filter(v => v.is_published !== false).slice(0, 6);
+  const firstRow = publishedVideos.slice(0, 3);
+  const secondRow = publishedVideos.slice(3, 6);
 
   return (
     <div style={{ minHeight: '100vh', fontFamily: "-apple-system" }}>
@@ -180,74 +169,56 @@ export default function HomePage() {
       {/* ===== Client Testimonials ===== */}
       <section style={{ padding: '80px 0', backgroundColor: '#ffffff' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-          <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', marginBottom: 12 }}>
-            ⭐ Client Testimonials
-          </h2>
+          <h2 style={{ fontSize: 32, fontWeight: 700, textAlign: 'center', marginBottom: 12 }}>⭐ Client Testimonials</h2>
           <p style={{ color: '#666', textAlign: 'center', maxWidth: 600, margin: '0 auto 48px', fontSize: 16 }}>
             Real feedback from global buyers who found their manufacturing partners through us
           </p>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-            <div style={{ backgroundColor: '#f9fafb', padding: '28px 24px', borderRadius: 12, border: '1px solid #eee' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>⭐⭐⭐⭐⭐</div>
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: '#333', marginBottom: 16 }}>
-                “We found a reliable PCB supplier within 3 days. The video gave us a real look at their production line — saved us a trip to China.”
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: '#1e3a5f', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 600 }}>JD</div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>J.D.</div>
-                  <div style={{ color: '#888', fontSize: 12 }}>Purchasing Director, United States</div>
+            {[
+              {
+                stars: '⭐⭐⭐⭐⭐',
+                text: '"We found a reliable PCB supplier within 3 days. The video gave us a real look at their production line — saved us a trip to China."',
+                initials: 'JD', color: '#1e3a5f',
+                name: 'J.D.', role: 'Purchasing Director, United States',
+              },
+              {
+                stars: '⭐⭐⭐⭐⭐',
+                text: '"We placed our first order with a factory we\'d never met in person. The video was more convincing than any brochure. 2 years and still going strong."',
+                initials: 'ER', color: '#2e7d32',
+                name: 'E.R.', role: 'Founder, Europe',
+              },
+              {
+                stars: '⭐⭐⭐⭐⭐',
+                text: '"We reviewed 10 factory videos and chose the most transparent one. Trust was built the moment we saw the real production floor."',
+                initials: 'TK', color: '#b71c1c',
+                name: 'T.K.', role: 'Supply Chain Manager, Asia',
+              },
+            ].map((t, i) => (
+              <div key={i} style={{ backgroundColor: '#f9fafb', padding: '28px 24px', borderRadius: 12, border: '1px solid #eee' }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>{t.stars}</div>
+                <p style={{ fontSize: 15, lineHeight: 1.7, color: '#333', marginBottom: 16 }}>{t.text}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: t.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 600 }}>{t.initials}</div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 14 }}>{t.name}</div>
+                    <div style={{ color: '#888', fontSize: 12 }}>{t.role}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div style={{ backgroundColor: '#f9fafb', padding: '28px 24px', borderRadius: 12, border: '1px solid #eee' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>⭐⭐⭐⭐⭐</div>
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: '#333', marginBottom: 16 }}>
-                “We placed our first order with a factory we'd never met in person. The video was more convincing than any brochure. 2 years and still going strong.”
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: '#2e7d32', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 600 }}>ER</div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>E.R.</div>
-                  <div style={{ color: '#888', fontSize: 12 }}>Founder, Europe</div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ backgroundColor: '#f9fafb', padding: '28px 24px', borderRadius: 12, border: '1px solid #eee' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>⭐⭐⭐⭐⭐</div>
-              <p style={{ fontSize: 15, lineHeight: 1.7, color: '#333', marginBottom: 16 }}>
-                “We reviewed 10 factory videos and chose the most transparent one. Trust was built the moment we saw the real production floor.”
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: '#b71c1c', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, fontWeight: 600 }}>TK</div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>T.K.</div>
-                  <div style={{ color: '#888', fontSize: 12 }}>Supply Chain Manager, Asia</div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginTop: 40, paddingTop: 40, borderTop: '1px solid #eee' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: '#1e3a5f' }}>500+</div>
-              <div style={{ color: '#666', fontSize: 13 }}>Global Buyers</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: '#1e3a5f' }}>200+</div>
-              <div style={{ color: '#666', fontSize: 13 }}>Partner Factories</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: '#1e3a5f' }}>95%</div>
-              <div style={{ color: '#666', fontSize: 13 }}>Satisfaction Rate</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 32, fontWeight: 700, color: '#1e3a5f' }}>30%</div>
-              <div style={{ color: '#666', fontSize: 13 }}>Avg. Cost Savings</div>
-            </div>
+            {[
+              { num: '500+', label: 'Global Buyers' },
+              { num: '200+', label: 'Partner Factories' },
+              { num: '95%', label: 'Satisfaction Rate' },
+              { num: '30%', label: 'Avg. Cost Savings' },
+            ].map((s, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 32, fontWeight: 700, color: '#1e3a5f' }}>{s.num}</div>
+                <div style={{ color: '#666', fontSize: 13 }}>{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
