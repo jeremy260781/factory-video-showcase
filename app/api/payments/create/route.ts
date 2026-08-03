@@ -8,13 +8,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'video_id and customer_email required' }, { status: 400 });
     }
 
-    // Airwallex API 创建 Payment Intent
-    const airwallexRes = await fetch('https://api.airwallex.com/v1/api/payment_intents/create', {
+    // 1. Airwallex 新版 API：先获取 Access Token
+    const tokenRes = await fetch('https://api.airwallex.com/api/v1/authentication/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': process.env.AIRWALLEX_API_KEY!,
         'x-client-id': process.env.AIRWALLEX_CLIENT_ID!,
+      },
+      body: JSON.stringify({}),
+    });
+
+    if (!tokenRes.ok) {
+      const tokenErr = await tokenRes.json().catch(() => ({}));
+      console.error('Airwallex token error:', tokenErr);
+      return NextResponse.json({ error: tokenErr.message || 'Airwallex auth failed' }, { status: 500 });
+    }
+
+    const { token } = await tokenRes.json();
+    if (!token) {
+      return NextResponse.json({ error: 'Airwallex token missing' }, { status: 500 });
+    }
+
+    // 2. 用 Bearer Token 创建 Payment Intent
+    const airwallexRes = await fetch('https://api.airwallex.com/api/v1/pa/payment_intents/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
         amount: 1900, // $19.00 in cents
