@@ -74,13 +74,10 @@ export default function AdminPage() {
       const tokenData = await tokenRes.json();
       if (!tokenRes.ok) throw new Error(tokenData.error);
 
-      // 2. 直接用签名 URL 上传文件到 OSS(带 public-read ACL,上传后公开可访问)
+      // 2. 直接用签名 URL 上传文件到 OSS(私有,播放时动态签名)
       const uploadRes = await fetch(tokenData.uploadUrl, {
         method: 'PUT',
-        headers: {
-          'Content-Type': file.type,
-          'x-oss-object-acl': 'public-read',
-        },
+        headers: { 'Content-Type': file.type },
         body: file,
       });
 

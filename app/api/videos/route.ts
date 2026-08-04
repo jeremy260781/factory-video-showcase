@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readJson, writeJson } from '@/lib/oss';
+import { readJson, writeJson, signUrl } from '@/lib/oss';
 
 // ============================================
 // 视频目录 API:数据存 OSS 上的 videos.json
@@ -30,10 +30,24 @@ function checkAuth(request: NextRequest): boolean {
   return password === ADMIN_PASSWORD;
 }
 
-// ===== 读取视频列表 =====
+// ===== 读取视频列表(生成临时签名播放链接) =====
 export async function GET() {
   const videos = (await readJson<Video[]>(VIDEOS_KEY)) || [];
-  return NextResponse.json(videos);
+  const result = videos.map((v) => ({
+    ...v,
+    video_url: toSignedUrl(v.video_url),
+    thumbnail_url: toSignedUrl(v.thumbnail_url),
+  }));
+  return NextResponse.json(result);
+}
+
+/** 将 OSS 对象 URL 转为带签名的临时播放链接(7天有效);非 OSS 链接原样返回 */
+function toSignedUrl(url: string): string {
+  if (!url) return url;
+  // 只处理阿里云 OSS 的链接
+  const m = url.match(/^https:\/\/[^/]+\.aliyuncs\.com\/(.+)$/);
+  if (!m) return url;
+  return signUrl('GET', m[1], '', 604800); // 7天
 }
 
 // ===== 新增视频 =====
