@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         video_id: parseInt(videoId),
         customer_email: customerEmail,
         customer_name: customerName,
-        amount: 1900,
+        amount: 100,
         currency: 'USD',
         airwallex_payment_intent_id: sessionId,
         status: 'succeeded',

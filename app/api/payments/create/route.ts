@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // ============================================
 // 创建 Stripe Checkout 支付会话
-// 客户支付 $19 USD 解锁单个视频(15秒预览后)
+// 客户支付 $1 USD 解锁单个视频(测试价,测完调回 $19)(15秒预览后)
 // ============================================
 
-const PRICE_USD_CENTS = 1900; // $19.00
+const PRICE_USD_CENTS = 100; // $1.00 测试价,测完调回 $19 (1900)
 
 export async function POST(request: NextRequest) {
   try {
