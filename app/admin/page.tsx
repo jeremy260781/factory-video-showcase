@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
 interface Video {
   id: number;
@@ -44,15 +43,14 @@ export default function AdminPage() {
     }
   };
 
-  // ===== 从 Supabase 加载视频 =====
+  // ===== 从 API 加载视频(数据存 OSS) =====
   const loadVideos = async () => {
-    const { data, error } = await supabase
-      .from('videos')
-      .select('*')
-      .order('id', { ascending: false });
-
-    if (!error && data) {
-      setVideos(data);
+    try {
+      const res = await fetch('/api/videos');
+      const data = await res.json();
+      if (Array.isArray(data)) setVideos(data);
+    } catch (e) {
+      console.error('加载视频失败:', e);
     }
   };
 
@@ -76,10 +74,13 @@ export default function AdminPage() {
       const tokenData = await tokenRes.json();
       if (!tokenRes.ok) throw new Error(tokenData.error);
 
-      // 2. 直接用签名 URL 上传文件到 OSS
+      // 2. 直接用签名 URL 上传文件到 OSS(带 public-read ACL,上传后公开可访问)
       const uploadRes = await fetch(tokenData.uploadUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type },
+        headers: {
+          'Content-Type': file.type,
+          'x-oss-object-acl': 'public-read',
+        },
         body: file,
       });
 
@@ -115,11 +116,15 @@ export default function AdminPage() {
         thumbnailUrl = (await uploadToOSS(thumbnailFile, 'thumbnails')) || '';
       }
 
-      // 保存到 Supabase
-      showMessage('Saving to database...', 'info');
-      const { data, error } = await supabase
-        .from('videos')
-        .insert({
+      // 保存视频信息到 OSS(videos.json)
+      showMessage('Saving to storage...', 'info');
+      const saveRes = await fetch('/api/videos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password,
+        },
+        body: JSON.stringify({
           title: videoForm.title,
           description: videoForm.description || '',
           video_url: videoUrl,
@@ -127,12 +132,13 @@ export default function AdminPage() {
           category: videoForm.category || 'Uncategorized',
           factory_name: videoForm.factory_name,
           product_name: videoForm.product_name,
-          is_published: true,
-        })
-        .select();
+        }),
+      });
 
-      if (error) {
-        showMessage('❌ Database error: ' + error.message, 'error');
+      const saveResult = await saveRes.json();
+
+      if (!saveRes.ok) {
+        showMessage('❌ Save error: ' + (saveResult.error || 'Failed'), 'error');
         setUploadingVideo(false);
         return;
       }
@@ -156,31 +162,33 @@ export default function AdminPage() {
   const deleteVideo = async (id: number) => {
     if (!confirm('Delete this video permanently?')) return;
 
-    const { error } = await supabase
-      .from('videos')
-      .delete()
-      .eq('id', id);
+    const res = await fetch(`/api/videos?id=${id}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-password': password },
+    });
 
-    if (error) {
-      showMessage('❌ Delete failed: ' + error.message, 'error');
-    } else {
+    if (res.ok) {
       showMessage('✅ Video deleted', 'success');
       setVideos(videos.filter(v => v.id !== id));
+    } else {
+      const data = await res.json().catch(() => ({}));
+      showMessage('❌ Delete failed: ' + (data.error || 'Unknown'), 'error');
     }
   };
 
   // ===== 切换发布状态 =====
   const togglePublish = async (video: Video) => {
-    const { error } = await supabase
-      .from('videos')
-      .update({ is_published: !video.is_published })
-      .eq('id', video.id);
+    const res = await fetch(`/api/videos?id=${video.id}`, {
+      method: 'PATCH',
+      headers: { 'x-admin-password': password },
+    });
 
-    if (error) {
-      showMessage('❌ Update failed: ' + error.message, 'error');
-    } else {
+    if (res.ok) {
       showMessage(video.is_published ? '📪 Video unpublished' : '📬 Video published', 'success');
       loadVideos();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      showMessage('❌ Update failed: ' + (data.error || 'Unknown'), 'error');
     }
   };
 
@@ -309,7 +317,7 @@ export default function AdminPage() {
         <div style={{ backgroundColor: '#fff3e0', padding: '16px 24px', borderRadius: 12, marginTop: 24 }}>
           <p style={{ fontSize: 14, color: '#e65100' }}>
             💰 <strong>Video unlock revenue:</strong> Each full video unlock costs <strong>$19 USD</strong>.
-            Payments are processed via Airwallex and recorded in the Supabase payments table.
+            Payments are processed via Airwallex and recorded in cloud storage.
           </p>
         </div>
 

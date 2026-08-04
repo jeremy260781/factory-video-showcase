@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
 
 const DEMO_VIDEOS: Record<string, any> = {
   '1': { id: 1, title: 'PCB Assembly Line - First Person Tour', description: '沉浸式参观PCB电路板生产线', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics Manufacturing', factory_name: 'Shenzhen Tech Electronics', product_name: 'PCB Assembly Line', is_published: true },
@@ -33,16 +32,21 @@ export default function VideoDetailPage() {
   // ===== 加载视频 =====
   useEffect(() => {
     async function loadVideo() {
-      // 先从 Supabase 查
-      const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('id', parseInt(videoId))
-        .single();
-
-      if (!error && data) {
-        setVideo({ ...data, is_published: data.is_published ?? true });
-      } else if (DEMO_VIDEOS[videoId]) {
+      try {
+        const res = await fetch('/api/videos');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const found = data.find((v: any) => String(v.id) === videoId);
+          if (found) {
+            setVideo({ ...found, is_published: found.is_published ?? true });
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('加载视频失败:', e);
+      }
+      if (DEMO_VIDEOS[videoId]) {
         setVideo(DEMO_VIDEOS[videoId]);
       } else {
         setVideo(null);

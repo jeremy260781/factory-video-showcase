@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
+// ============================================
+// OSS 上传签名:生成带 x-oss-object-acl: public-read
+// 的签名 PUT URL,上传后的视频公开可访问
+// ============================================
+
 function hmacSha1(key: string, data: string): string {
   return crypto.createHmac('sha1', key).update(data).digest('base64');
 }
@@ -8,7 +13,8 @@ function hmacSha1(key: string, data: string): string {
 function getSignature(bucket: string, objectKey: string, contentType: string, expires: number): string {
   const verb = 'PUT';
   const md5 = '';
-  const ossHeaders = '';
+  // 关键:上传时设置对象 ACL 为 public-read,视频才能公开播放
+  const ossHeaders = 'x-oss-object-acl:public-read\n';
   const resource = `/${bucket}/${objectKey}`;
   const stringToSign = `${verb}\n${md5}\n${contentType}\n${expires}\n${ossHeaders}${resource}`;
   return hmacSha1(process.env.OSS_ACCESS_KEY_SECRET!, stringToSign);
@@ -34,10 +40,10 @@ export async function POST(request: NextRequest) {
     const ctype = contentType || 'application/octet-stream';
     const signature = getSignature(bucket, key, ctype, expires);
 
-    // 构造签名上传 URL
+    // 构造签名上传 URL(签名包含 public-read ACL)
     const uploadUrl = `https://${bucket}.${region}.aliyuncs.com/${key}?OSSAccessKeyId=${accessKeyId}&Expires=${expires}&Signature=${encodeURIComponent(signature)}`;
 
-    // 文件公开访问 URL（如果 bucket 是 public-read）
+    // 文件公开访问 URL
     const publicUrl = `https://${bucket}.${region}.aliyuncs.com/${key}`;
 
     return NextResponse.json({ uploadUrl, publicUrl, key });

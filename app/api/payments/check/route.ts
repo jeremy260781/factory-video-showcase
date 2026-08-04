@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { readJson } from '@/lib/oss';
+
+// ============================================
+// 检查视频是否已解锁:读取 OSS 上的 payments.json
+// ============================================
+
+const PAYMENTS_KEY = 'payments.json';
+
+interface Payment {
+  video_id: number;
+  customer_email: string;
+  status: string;
+  created_at: string;
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -11,28 +24,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
+    const payments = (await readJson<Payment[]>(PAYMENTS_KEY)) || [];
+    const unlocked = payments.some(
+      (p) =>
+        String(p.video_id) === videoId &&
+        p.customer_email?.toLowerCase() === email.toLowerCase() &&
+        p.status === 'succeeded'
     );
-
-    const { data, error } = await supabase
-      .from('payments')
-      .select('id, status, created_at')
-      .eq('video_id', parseInt(videoId))
-      .eq('customer_email', email)
-      .eq('status', 'succeeded')
-      .limit(1);
-
-    if (error) {
-      console.error('Payment check error:', error);
-      return NextResponse.json({ unlocked: false });
-    }
-
-    return NextResponse.json({
-      unlocked: data && data.length > 0,
-    });
+    return NextResponse.json({ unlocked });
   } catch (error) {
     console.error('Payment check error:', error);
     return NextResponse.json({ unlocked: false });

@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { readJson, writeJson } from '@/lib/oss';
 import crypto from 'crypto';
+
+// ============================================
+// Airwallex 支付成功回调:记录到 OSS 上的 payments.json
+// (验签逻辑不变,存储从 Supabase 换成 OSS)
+// ============================================
+
+const PAYMENTS_KEY = 'payments.json';
+
+interface Payment {
+  video_id: number;
+  customer_email: string;
+  customer_name: string;
+  amount: number;
+  currency: string;
+  airwallex_payment_intent_id: string;
+  status: string;
+  created_at: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,17 +83,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    // 用服务角色 key 操作 Supabase
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
+    // ===== 记录支付到 OSS payments.json（去重） =====
+    const payments = (await readJson<Payment[]>(PAYMENTS_KEY)) || [];
 
-    // 记录支付到 Supabase（airwallex_payment_intent_id 有 UNIQUE 约束，重复通知会走 23505）
-    const { error: insertError } = await supabase
-      .from('payments')
-      .insert({
+    const exists = payments.some((p) => p.airwallex_payment_intent_id === paymentIntentId);
+    if (exists) {
+      console.log('Duplicate webhook, ignoring');
+    } else {
+      payments.push({
         video_id: parseInt(videoId),
         customer_email: customerEmail,
         customer_name: customerName,
@@ -83,13 +98,11 @@ export async function POST(request: NextRequest) {
         currency: 'USD',
         airwallex_payment_intent_id: paymentIntentId,
         status: 'succeeded',
+        created_at: new Date().toISOString(),
       });
-
-    if (insertError) {
-      if (insertError.code === '23505') {
-        console.log('Duplicate webhook, ignoring');
-      } else {
-        console.error('Failed to save payment:', insertError);
+      const ok = await writeJson(PAYMENTS_KEY, payments);
+      if (!ok) {
+        console.error('Failed to save payment to OSS');
       }
     }
 
