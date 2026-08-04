@@ -23,6 +23,8 @@ export async function POST(request: NextRequest) {
     // 构建 Checkout Session 参数
     const params = new URLSearchParams();
     params.append('mode', 'payment');
+    // 禁用 Managed Payments(避免产品税码要求)
+    params.append('managed_payments[enabled]', 'false');
     params.append('success_url', `${return_url}?unlocked=1`);
     params.append('cancel_url', `${return_url}?cancel=1`);
     params.append('metadata[video_id]', String(video_id));
