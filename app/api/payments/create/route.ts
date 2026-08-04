@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// ============================================
+// 创建 Stripe Checkout 支付会话
+// 客户支付 $19 USD 解锁单个视频(15秒预览后)
+// ============================================
+
+const PRICE_USD_CENTS = 1900; // $19.00
+
 export async function POST(request: NextRequest) {
   try {
     const { video_id, customer_email, customer_name, return_url } = await request.json();
@@ -8,74 +15,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'video_id and customer_email required' }, { status: 400 });
     }
 
-    // 1. Airwallex 新版 API：先获取 Access Token
-    const tokenRes = await fetch('https://api.airwallex.com/api/v1/authentication/login', {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
+
+    // 构建 Checkout Session 参数
+    const params = new URLSearchParams();
+    params.append('mode', 'payment');
+    params.append('success_url', `${return_url}?unlocked=1`);
+    params.append('cancel_url', `${return_url}?cancel=1`);
+    params.append('metadata[video_id]', String(video_id));
+    params.append('metadata[customer_email]', customer_email);
+    if (customer_name) params.append('metadata[customer_name]', customer_name);
+    params.append('line_items[0][quantity]', '1');
+    params.append('line_items[0][price_data][currency]', 'usd');
+    params.append('line_items[0][price_data][unit_amount]', String(PRICE_USD_CENTS));
+    params.append('line_items[0][price_data][product_data][name]', 'Factory Video Unlock');
+
+    const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.AIRWALLEX_API_KEY!,
-        'x-client-id': process.env.AIRWALLEX_CLIENT_ID!,
+        'Authorization': `Bearer ${secretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({}),
+      body: params.toString(),
     });
 
-    if (!tokenRes.ok) {
-      const tokenErr = await tokenRes.json().catch(() => ({}));
-      console.error('Airwallex token error:', tokenErr);
-      return NextResponse.json({ error: tokenErr.message || 'Airwallex auth failed' }, { status: 500 });
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error('Stripe create session error:', data);
+      return NextResponse.json({ error: data.error?.message || 'Payment creation failed' }, { status: 500 });
     }
-
-    const { token } = await tokenRes.json();
-    if (!token) {
-      return NextResponse.json({ error: 'Airwallex token missing' }, { status: 500 });
-    }
-
-    // 2. 用 Bearer Token 创建 Payment Intent
-    const airwallexRes = await fetch('https://api.airwallex.com/api/v1/pa/payment_intents/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        amount: 1900, // $19.00 in cents
-        currency: 'USD',
-        merchant_order_id: `video_${video_id}_${Date.now()}`,
-        request_id: `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        order: {
-          type: 'physical_goods',
-          products: [
-            {
-              type: 'digital',
-              name: 'Factory Video Unlock',
-              quantity: 1,
-              price: 1900,
-              currency: 'USD',
-            },
-          ],
-        },
-        metadata: {
-          video_id: String(video_id),
-          customer_email,
-          customer_name: customer_name || '',
-        },
-      }),
-    });
-
-    const paymentIntent = await airwallexRes.json();
-
-    if (!airwallexRes.ok) {
-      console.error('Airwallex error:', paymentIntent);
-      return NextResponse.json({ error: paymentIntent.message || 'Payment creation failed' }, { status: 500 });
-    }
-
-    // 拿到 Hosted Payment Page URL
-    const hostedPageUrl = `https://www.airwallex.com/pay/${paymentIntent.id}`;
 
     return NextResponse.json({
-      payment_intent_id: paymentIntent.id,
-      hosted_page_url: hostedPageUrl,
-      amount: 1900,
+      payment_intent_id: data.payment_intent || data.id,
+      hosted_page_url: data.url,
+      amount: PRICE_USD_CENTS,
       currency: 'USD',
     });
   } catch (error: any) {
