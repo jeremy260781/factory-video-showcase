@@ -55,15 +55,14 @@ export async function readJson<T>(objectKey: string): Promise<T | null> {
   }
 }
 
-/** 向 OSS 写入 JSON 对象(公开读) */
+/** 向 OSS 写入 JSON 对象(私有,读取时用签名 GET) */
 export async function writeJson(objectKey: string, data: unknown): Promise<boolean> {
   try {
-    const url = signUrl('PUT', objectKey, 'application/json', 900, true);
+    const url = signUrl('PUT', objectKey, 'application/json', 900, false);
     const res = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'x-oss-object-acl': 'public-read',
       },
       body: JSON.stringify(data),
     });
