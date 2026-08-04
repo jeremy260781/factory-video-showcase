@@ -53,6 +53,17 @@ export default function HomePage() {
 
     fetchVideos();
 
+    // 获取背景视频签名链接(OSS 私有桶需要签名才能播放)
+    fetch('/api/oss/sign?key=videos/1785832738516-6rj37l.mp4')
+      .then(r => r.json())
+      .then(d => {
+        if (d.url && videoRef.current) {
+          videoRef.current.src = d.url;
+          videoRef.current.play().catch(() => {});
+        }
+      })
+      .catch(() => {});
+
     if (videoRef.current) {
       videoRef.current.play().catch(() => {});
     }
