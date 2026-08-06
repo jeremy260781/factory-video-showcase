@@ -97,6 +97,30 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== What Is This / How It Works ===== */}
+      <section style={{ padding: '80px 0', backgroundColor: 'white' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: 32, marginBottom: 12, fontWeight: 700 }}>How It Works</h2>
+          <p style={{ color: '#666', fontSize: 16, maxWidth: 640, margin: '0 auto 48px' }}>
+            We help global buyers find real source factories — the video is the proof.
+            Every tour is filmed on the actual production floor, no stock footage, no filters.
+          </p>
+          <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {[
+              { icon: '🎬', title: '1. Browse Real Factory Videos', desc: 'Watch first-person tours from real production lines across China.' },
+              { icon: '👀', title: '2. Preview Free, Unlock Full', desc: 'Preview the first 15 seconds free. Unlock the full video for $19.99 when it looks right.' },
+              { icon: '✅', title: '3. Verify Before You Visit', desc: 'Shortlist factories with confidence — then book a paid factory inspection for the final check.' },
+            ].map((step) => (
+              <div key={step.title} style={{ flex: 1, minWidth: 260, maxWidth: 300, padding: '32px 24px', borderRadius: 16, backgroundColor: '#f8fafc', border: '1px solid #e5e7eb' }}>
+                <div style={{ fontSize: 40, marginBottom: 16 }}>{step.icon}</div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{step.title}</h3>
+                <p style={{ color: '#666', fontSize: 14, lineHeight: 1.6 }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== Featured Videos ===== */}
       <section id="videos" style={{ padding: '80px 0', backgroundColor: '#f5f5f5' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
