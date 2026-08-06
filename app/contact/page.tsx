@@ -252,9 +252,9 @@ export default function ContactPage() {
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: '4px' }}>
                 Email
               </p>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                support@factorydirect.com
-              </p>
+              <a href="mailto:jeremy.ou@ultronfs.com" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0, textDecoration: 'none' }}>
+                jeremy.ou@ultronfs.com
+              </a>
             </div>
             <div>
               <div style={{ fontSize: '28px' }}>💬</div>
@@ -262,17 +262,17 @@ export default function ContactPage() {
                 WeChat
               </p>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                FactoryDirect_CN
+                jeremy15078393
               </p>
             </div>
             <div>
               <div style={{ fontSize: '28px' }}>📞</div>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '600', marginTop: '4px' }}>
-                Phone
+                Phone / WhatsApp
               </p>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                +86 400 8888 666
-              </p>
+              <a href="tel:+8618138300804" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0, textDecoration: 'none' }}>
+                +86 181 3830 0804
+              </a>
             </div>
           </div>
         </div>
