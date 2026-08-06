@@ -4,14 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-const DEMO_VIDEOS: Record<string, any> = {
-  '1': { id: 1, title: 'PCB Assembly Line - First Person Tour', description: '沉浸式参观PCB电路板生产线', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics Manufacturing', factory_name: 'Shenzhen Tech Electronics', product_name: 'PCB Assembly Line', is_published: true },
-  '2': { id: 2, title: 'Garment Production - From Fabric to Finished', description: '从面料到成衣的完整生产流程', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Textile & Apparel', factory_name: 'Guangzhou Textile Co.', product_name: 'Garment Production', is_published: true },
-  '3': { id: 3, title: 'CNC Machining Process - Precision Parts', description: '高精度CNC加工过程展示', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Machinery & Parts', factory_name: 'Dongguan Precision Mfg', product_name: 'CNC Machining Process', is_published: true },
-  '4': { id: 4, title: 'LED Display Assembly Workshop Tour', description: 'LED显示屏组装车间参观', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Electronics', factory_name: 'Shenzhen Optoelectronics', product_name: 'LED Display Assembly', is_published: true },
-  '5': { id: 5, title: 'Stainless Steel Kitchenware Production', description: '不锈钢厨具生产工艺', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Kitchenware', factory_name: 'Yongkang Metalworks', product_name: 'Stainless Steel Kitchenware', is_published: true },
-  '6': { id: 6, title: 'Injection Molding - Plastic Parts Factory', description: '注塑成型塑料零件工厂', video_url: 'https://www.w3schools.com/html/mov_bbb.mp4', thumbnail_url: '', category: 'Plastic Manufacturing', factory_name: 'Ningbo Plastics Co.', product_name: 'Injection Molding', is_published: true },
-};
+const DEMO_VIDEOS: Record<string, any> = {};
 
 export default function VideoDetailPage() {
   const params = useParams();

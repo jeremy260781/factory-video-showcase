@@ -10,7 +10,7 @@ import { readJson, writeJson, signUrl } from '@/lib/oss';
 // ============================================
 
 const VIDEOS_KEY = 'videos.json';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'asd123';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Fty@2026!';
 
 interface Video {
   id: number;

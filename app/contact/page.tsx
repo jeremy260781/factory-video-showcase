@@ -20,13 +20,26 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
 
-    // 模拟提交
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log('表单数据:', form);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    setSubmitted(true);
-    setLoading(false);
-    setForm({ name: '', email: '', company: '', message: '' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to send');
+      }
+
+      setSubmitted(true);
+      setForm({ name: '', email: '', company: '', message: '' });
+    } catch (err: any) {
+      console.error('提交失败:', err);
+      alert('Message failed to send. Please email us directly at jeremy.ou@ultronfs.com');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

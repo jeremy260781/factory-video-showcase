@@ -25,6 +25,7 @@ export default function AdminPage() {
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
 
   const showMessage = (msg: string, type: 'success' | 'error' | 'info' = 'info') => {
     setMessage(msg);
@@ -32,14 +33,23 @@ export default function AdminPage() {
     setTimeout(() => setMessage(''), 6000);
   };
 
-  // ===== 登录 =====
-  const handleLogin = () => {
-    if (password === 'asd123') {
-      setIsLoggedIn(true);
-      showMessage('✅ Login successful', 'success');
-      loadVideos();
-    } else {
-      showMessage('❌ Wrong password', 'error');
+  // ===== 登录(通过 API 验证,前端不保存密码) =====
+  const handleLogin = async () => {
+    try {
+      const res = await fetch('/api/admin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setIsLoggedIn(true);
+        showMessage('✅ Login successful', 'success');
+        loadVideos();
+      } else {
+        showMessage('❌ Wrong password', 'error');
+      }
+    } catch (e) {
+      showMessage('❌ Login failed, please try again', 'error');
     }
   };
 
@@ -55,8 +65,26 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (isLoggedIn) loadVideos();
+    if (isLoggedIn) {
+      loadVideos();
+      loadContactMessages();
+    }
   }, [isLoggedIn]);
+
+  // ===== 从 API 加载联系留言 =====
+  const loadContactMessages = async () => {
+    try {
+      const res = await fetch('/api/contact', {
+        headers: { 'x-admin-password': password },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setContactMessages(data);
+      }
+    } catch (e) {
+      console.error('加载留言失败:', e);
+    }
+  };
 
   // ===== OSS 上传文件 =====
   const uploadToOSS = async (file: File, folder: string): Promise<string | null> => {
@@ -307,6 +335,26 @@ export default function AdminPage() {
               </div>
             ))}
             {videos.length === 0 && <p style={{ color: '#999' }}>No videos yet. Upload your first factory tour!</p>}
+          </div>
+        </div>
+
+        {/* ===== 联系留言 ===== */}
+        <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: 12, marginTop: 24 }}>
+          <h2 style={{ fontSize: 20, marginBottom: 16 }}>📩 Contact Messages ({contactMessages.length})</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {contactMessages.map((m) => (
+              <div key={m.id} style={{ padding: '12px 16px', backgroundColor: '#f9f9f9', borderRadius: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                  <strong>{m.name}</strong>
+                  <span style={{ color: '#888', fontSize: 13 }}>{new Date(m.created_at).toLocaleString()}</span>
+                </div>
+                <p style={{ fontSize: 13, color: '#555', margin: '4px 0' }}>
+                  📧 {m.email}{m.company ? ` • 🏢 ${m.company}` : ''}
+                </p>
+                <p style={{ fontSize: 14, color: '#333', margin: '4px 0 0' }}>{m.message}</p>
+              </div>
+            ))}
+            {contactMessages.length === 0 && <p style={{ color: '#999' }}>No messages yet.</p>}
           </div>
         </div>
 
