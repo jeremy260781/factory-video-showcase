@@ -19,6 +19,7 @@ export default function VideoDetailPage() {
   const [customerEmail, setCustomerEmail] = useState('');
   const [payStep, setPayStep] = useState<'email' | 'pay'>('email');
   const [payMessage, setPayMessage] = useState('');
+  const [progress, setProgress] = useState(0);
 
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -82,8 +83,12 @@ export default function VideoDetailPage() {
     }
   }, [checkUnlock, searchParams]);
 
-  // ===== 15秒预览限制 =====
+  // ===== 15秒预览限制 + 进度条更新 =====
   const handleTimeUpdate = useCallback(() => {
+    if (videoRef.current) {
+      const dur = videoRef.current.duration || 1;
+      setProgress(Math.min((videoRef.current.currentTime / dur) * 100, 100));
+    }
     if (videoRef.current && !isUnlocked) {
       const ct = videoRef.current.currentTime;
       if (ct >= 15) {
@@ -190,6 +195,13 @@ export default function VideoDetailPage() {
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: isUnlocked ? 'pointer' : 'default' }}
           />
 
+          {/* ===== 进度条（预览时也可见） ===== */}
+          {!isUnlocked && (
+            <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, backgroundColor: 'rgba(255,255,255,0.25)' }}>
+              <div style={{ height: '100%', width: `${progress}%`, backgroundColor: '#4da3ff', transition: 'width 0.2s linear' }} />
+            </div>
+          )}
+
           {/* ===== 付费遮罩（15秒后弹出） ===== */}
           {showPaywall && !isUnlocked && (
             <div style={{
@@ -232,7 +244,7 @@ export default function VideoDetailPage() {
                       borderRadius: 8, cursor: 'pointer',
                     }}
                   >
-                    Unlock Full Video — $19.99
+                    Unlock Full Video — $1
                   </button>
 
                   {payMessage && (
