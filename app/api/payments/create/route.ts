@@ -30,6 +30,9 @@ export async function POST(request: NextRequest) {
     params.append('metadata[video_id]', String(video_id));
     params.append('metadata[customer_email]', customer_email);
     if (customer_name) params.append('metadata[customer_name]', customer_name);
+    // 关键:把客户邮箱传给 Stripe,支付成功后 Stripe 会自动给该邮箱发收据邮件
+    // (之前只放 metadata,Stripe 不知道客户邮箱,所以只有收款方收到通知邮件)
+    params.append('customer_email', customer_email);
     params.append('line_items[0][quantity]', '1');
     params.append('line_items[0][price_data][currency]', 'usd');
     params.append('line_items[0][price_data][unit_amount]', String(PRICE_USD_CENTS));
