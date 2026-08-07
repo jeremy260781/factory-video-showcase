@@ -126,7 +126,7 @@ export default function HomePage() {
                 {firstRow.map((video) => (
                   <a key={video.id} href={`/video/${video.id}`} style={{ flex: 1, textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ backgroundColor: '#000', borderRadius: 12, overflow: 'hidden', position: 'relative', paddingTop: '56.25%' }}>
-                      <video src={video.video_url || 'https://www.w3schools.com/html/mov_bbb.mp4'} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                      <video src={video.video_url || 'https://www.w3schools.com/html/mov_bbb.mp4'} poster={video.thumbnail_url || undefined} preload="none" muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                         onMouseEnter={(e) => { const t = e.target as HTMLVideoElement; t.play().catch(() => {}); }}
                         onMouseLeave={(e) => { const t = e.target as HTMLVideoElement; t.pause(); t.currentTime = 0; }}
                       />
@@ -142,7 +142,7 @@ export default function HomePage() {
                 {secondRow.map((video) => (
                   <a key={video.id} href={`/video/${video.id}`} style={{ flex: 1, textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ backgroundColor: '#000', borderRadius: 12, overflow: 'hidden', position: 'relative', paddingTop: '56.25%' }}>
-                      <video src={video.video_url || 'https://www.w3schools.com/html/mov_bbb.mp4'} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                      <video src={video.video_url || 'https://www.w3schools.com/html/mov_bbb.mp4'} poster={video.thumbnail_url || undefined} preload="none" muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                         onMouseEnter={(e) => { const t = e.target as HTMLVideoElement; t.play().catch(() => {}); }}
                         onMouseLeave={(e) => { const t = e.target as HTMLVideoElement; t.pause(); t.currentTime = 0; }}
                       />
