@@ -244,7 +244,7 @@ export default function VideoDetailPage() {
                       borderRadius: 8, cursor: 'pointer',
                     }}
                   >
-                    Unlock Full Video — $1
+                    Unlock Full Video — $19.99
                   </button>
 
                   {payMessage && (

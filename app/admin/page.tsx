@@ -361,7 +361,7 @@ export default function AdminPage() {
         {/* ===== Payment Records Link ===== */}
         <div style={{ backgroundColor: '#fff3e0', padding: '16px 24px', borderRadius: 12, marginTop: 24 }}>
           <p style={{ fontSize: 14, color: '#e65100' }}>
-            💰 <strong>Video unlock revenue:</strong> Each full video unlock costs <strong>$1 USD (测试价,测完调回 $19.99)</strong>. Payments are processed via Stripe and recorded in cloud storage.
+            💰 <strong>Video unlock revenue:</strong> Each full video unlock costs <strong>$19.99 USD</strong>. Payments are processed via Stripe and recorded in cloud storage.
           </p>
         </div>
 
