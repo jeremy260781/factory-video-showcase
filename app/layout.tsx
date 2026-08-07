@@ -13,8 +13,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Factory Direct - Chinese Factory Video Showcase",
-  description: "See inside Chinese factories in real time. First-person factory tours for global buyers.",
+  metadataBase: new URL("https://etf-nodes.com"),
+  title: {
+    default: "Factory Tour Videos | Real Chinese Factory Tours for Global Buyers",
+    template: "%s | Factory Tour Videos",
+  },
+  description: "Watch real first-person factory tour videos filmed on actual production floors across China. Verify source factories before you visit. Factory Direct Video Showcase by UltronFS.",
+  keywords: ["factory tour video", "China factory verification", "source factory", "factory audit video", "supplier verification", "Chinese manufacturer video"],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Factory Tour Videos",
+    title: "Factory Tour Videos | Real Chinese Factory Tours",
+    description: "First-person factory tour videos filmed on real production floors in China. Verify source factories before you visit.",
+    url: "https://etf-nodes.com",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Factory Tour Videos | Real Chinese Factory Tours",
+    description: "First-person factory tour videos filmed on real production floors in China.",
+  },
+};
+
+export const viewport = {
+  themeColor: "#111111",
 };
 
 export default function RootLayout({
