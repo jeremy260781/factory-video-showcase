@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://etf-nodes.com"),
   title: {
-    default: "Factory Tour Videos | Real Chinese Factory Tours for Global Buyers",
-    template: "%s | Factory Tour Videos",
+    default: "China Sourcing Partner | Supplier Matching & Factory Verification — ETF-NODES",
+    template: "%s | ETF-NODES",
   },
-  description: "Watch real first-person factory tour videos filmed on actual production floors across China. Verify source factories before you visit. Factory Direct Video Showcase by UltronFS.",
-  keywords: ["factory tour video", "China factory verification", "source factory", "factory audit video", "supplier verification", "Chinese manufacturer video"],
+  description: "ETF-NODES helps global buyers find suitable, reliable Chinese suppliers — supplier matching, factory verification, quality follow-up and export coordination. Start your sourcing request.",
+  keywords: ["China sourcing partner", "China supplier matching", "factory verification China", "China sourcing agent", "supplier sourcing", "factory audit", "import from China", "China procurement"],
   alternates: {
     canonical: "/",
   },
@@ -29,15 +29,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Factory Tour Videos",
-    title: "Factory Tour Videos | Real Chinese Factory Tours",
-    description: "First-person factory tour videos filmed on real production floors in China. Verify source factories before you visit.",
+    siteName: "ETF-NODES",
+    title: "China Sourcing Partner | Supplier Matching & Factory Verification",
+    description: "We help global buyers find suitable, reliable Chinese suppliers — from supplier matching and factory verification to quality follow-up and export coordination.",
     url: "https://etf-nodes.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Factory Tour Videos | Real Chinese Factory Tours",
-    description: "First-person factory tour videos filmed on real production floors in China.",
+    title: "China Sourcing Partner | ETF-NODES",
+    description: "Supplier matching, factory verification and export coordination for global buyers sourcing in China.",
   },
 };
 
