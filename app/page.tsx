@@ -102,7 +102,7 @@ export default function HomePage() {
         </video>
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,20,35,0.62)' }} />
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', color: 'white', padding: '100px 20px 40px', maxWidth: 900 }}>
-          <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', letterSpacing: 2, textTransform: 'uppercase', opacity: 0.85, marginBottom: 14 }}>China Sourcing · Factory Verified · Export-Ready</p>
+          <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', letterSpacing: 2, textTransform: 'uppercase', opacity: 0.85, marginBottom: 14 }}>China Sourcing · Supplier Assessment · Export Support</p>
           <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', marginBottom: 14, fontWeight: 700, lineHeight: 1.15 }}>Your China Sourcing Partner for Verified Supply Chains</h1>
           <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', marginBottom: 0, opacity: 0.92, lineHeight: 1.6, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }}>
             We help global buyers identify reliable manufacturers, verify production capability and manage OEM sourcing with confidence.
