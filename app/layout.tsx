@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://etf-nodes.com"),
+  metadataBase: new URL("https://www.etf-nodes.com"),
   title: {
     default: "China Sourcing Partner | Supplier Matching & Factory Verification — ETF-NODES",
     template: "%s | ETF-NODES",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "ETF-NODES",
     title: "China Sourcing Partner | Supplier Matching & Factory Verification",
     description: "We help global buyers identify reliable manufacturers, verify production capability and manage OEM sourcing with confidence.",
-    url: "https://etf-nodes.com",
+    url: "https://www.etf-nodes.com",
   },
   twitter: {
     card: "summary_large_image",

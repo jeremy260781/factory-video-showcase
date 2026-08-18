@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://etf-nodes.com/sitemap.xml",
+    sitemap: "https://www.etf-nodes.com/sitemap.xml",
   };
 }
