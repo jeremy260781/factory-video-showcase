@@ -113,8 +113,8 @@ export default function HomePage() {
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '12px 16px', display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap', color: 'white', fontSize: 16, textAlign: 'center', lineHeight: 1.4 }}>
             <span><strong style={{ fontSize: 16, color: '#FFC94D' }}>20+</strong> supplier relationships developed</span>
             <span><strong style={{ fontSize: 16, color: '#FFC94D' }}>30+</strong> sourcing projects supported</span>
-            <span>Buyers supported across <strong style={{ fontSize: 16, color: '#FFC94D' }}>15</strong> markets</span>
-            <span><strong style={{ fontSize: 16, color: '#FFC94D' }}>93%</strong> client satisfaction</span>
+            <span><strong style={{ fontSize: 16, color: '#FFC94D' }}>15+</strong> Global Markets Served</span>
+            <span>Quality & Supplier Verification Focused</span>
           </div>
         </div>
       </section>
