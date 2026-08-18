@@ -1,9 +1,0 @@
-{
-  "redirects": [
-    {
-      "source": "https://etf-nodes.com/:path*",
-      "destination": "https://www.etf-nodes.com/:path*",
-      "permanent": true
-    }
-  ]
-}
