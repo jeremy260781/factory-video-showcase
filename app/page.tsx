@@ -105,7 +105,7 @@ export default function HomePage() {
           <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', letterSpacing: 2, textTransform: 'uppercase', opacity: 0.85, marginBottom: 14 }}>China Sourcing · Factory Verified · Export-Ready</p>
           <h1 style={{ fontSize: 'clamp(28px, 5vw, 44px)', marginBottom: 14, fontWeight: 700, lineHeight: 1.15 }}>Your China Sourcing Partner for Verified Supply Chains</h1>
           <p style={{ fontSize: 'clamp(15px, 2vw, 18px)', marginBottom: 0, opacity: 0.92, lineHeight: 1.6, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto' }}>
-            We help global buyers find suitable, reliable Chinese suppliers — from supplier matching and factory verification to quality follow-up and export coordination.
+            We help global buyers identify reliable manufacturers, verify production capability and manage OEM sourcing with confidence.
           </p>
         </div>
         {/* 信任条 */}

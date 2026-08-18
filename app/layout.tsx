@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "China Sourcing Partner | Supplier Matching & Factory Verification — ETF-NODES",
     template: "%s | ETF-NODES",
   },
-  description: "ETF-NODES helps global buyers find suitable, reliable Chinese suppliers — supplier matching, factory verification, quality follow-up and export coordination. Start your sourcing request.",
+  description: "ETF-NODES helps global buyers identify reliable manufacturers, verify production capability and manage OEM sourcing with confidence. Start your sourcing request.",
   keywords: ["China sourcing partner", "China supplier matching", "factory verification China", "China sourcing agent", "supplier sourcing", "factory audit", "import from China", "China procurement"],
   alternates: {
     canonical: "/",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "ETF-NODES",
     title: "China Sourcing Partner | Supplier Matching & Factory Verification",
-    description: "We help global buyers find suitable, reliable Chinese suppliers — from supplier matching and factory verification to quality follow-up and export coordination.",
+    description: "We help global buyers identify reliable manufacturers, verify production capability and manage OEM sourcing with confidence.",
     url: "https://etf-nodes.com",
   },
   twitter: {
